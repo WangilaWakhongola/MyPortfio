@@ -169,23 +169,25 @@
             
             type() {
                 const text = this.statements[this.index];
+                
                 if (this.isDeleting) {
                     this.element.textContent = text.substring(0, this.charIndex--);
+                    
+                    if (this.charIndex < 0) {
+                        this.isDeleting = false;
+                        this.index = (this.index + 1) % this.statements.length;
+                        this.charIndex = 0;
+                        this.typeTimeout = setTimeout(() => this.type(), 500);
+                        return;
+                    }
                 } else {
                     this.element.textContent = text.substring(0, this.charIndex++);
-                }
-                
-                if (!this.isDeleting && this.charIndex === text.length) {
-                    this.typeTimeout = setTimeout(() => { 
-                        this.isDeleting = true; 
-                        this.type(); 
-                    }, 2000);
-                    return;
-                }
-                
-                if (this.isDeleting && this.charIndex === 0) {
-                    this.isDeleting = false;
-                    this.index = (this.index + 1) % this.statements.length;
+                    
+                    if (this.charIndex > text.length) {
+                        this.isDeleting = true;
+                        this.typeTimeout = setTimeout(() => this.type(), 2000);
+                        return;
+                    }
                 }
                 
                 this.typeTimeout = setTimeout(() => this.type(), this.isDeleting ? 50 : 100);
